@@ -10,8 +10,14 @@ pyyaml = "*"
 "jinja2" = "*"
 click = "*"
 logme = "*"
+background = "*"
 
 [dev-packages]
+"flake8" = "*"
+black = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true

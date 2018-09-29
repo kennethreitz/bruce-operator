@@ -1,3 +1,7 @@
 {
-    "python.pythonPath": "C:\\Users\\me\\.virtualenvs\\bruce-server-_01-8y1n\\Scripts\\python.exe"
+    "python.pythonPath": "C:\\Users\\me\\.virtualenvs\\bruce-operator-UKafV52I\\Scripts\\python.exe",
+    "python.unitTest.promptToConfigure": false,
+    "python.unitTest.pyTestEnabled": false,
+    "python.unitTest.unittestEnabled": false,
+    "python.unitTest.nosetestsEnabled": false
 }
