@@ -1,0 +1,9 @@
+apiVersion: "bruce.kennethreitz.org/v1alpha1"
+kind: "App"
+metadata:
+  name: "httpbin"
+spec:
+  name: "httpbin"
+  repo: "https://github.com/requests/httpbin.git"
+  auto_deploy_latest_release: true
+  # auto_deploy_branch: "master"

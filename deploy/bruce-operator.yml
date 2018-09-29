@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bruce-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: bruce-operator
+  template:
+    metadata:
+      labels:
+        name: bruce-operator
+    spec:
+      containers:
+        - name: bruce-operator
+          image: bruceproject/operator:latest
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
