@@ -31,6 +31,7 @@ class Operator:
         # Ensure resource definitions.
         self.ensure_resource_definitions()
         self.ensure_volumes()
+        self.fetch_buildpacks()
         # print(self.installed_buildpacks)
         # exit()
 
@@ -95,6 +96,13 @@ class Operator:
     def ensure_volumes(self):
         self.logger.info("Ensuring Buildpack volume resource...")
         kubectl(f"apply -f ./deploy/buildpacks-volume.yml -n {WATCH_NAMESPACE}")
+
+    def fetch_buildpack(self, buildpack_name):
+        self.logger.info(f"Pretending to fetch {buildpack_name!r} buildpack!")
+
+    def fetch_buildpacks(self):
+        for buildpack in self.installed_buildpacks:
+            self.fetch_buildpack(buildpack["metadata"]["name"])
 
     def watch(self):
         self.logger.info("Pretending to watch...")

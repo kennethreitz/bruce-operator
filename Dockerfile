@@ -9,4 +9,4 @@ RUN apt-get update
 RUN apt-get install -y kubectl
 
 COPY . /app
-CMD python3 -m bruce_operator
+CMD bruce-operator watch

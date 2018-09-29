@@ -11,6 +11,8 @@ pyyaml = "*"
 click = "*"
 logme = "*"
 background = "*"
+docopt = "*"
+bruce-operator = {editable = true, path = "."}
 
 [dev-packages]
 "flake8" = "*"

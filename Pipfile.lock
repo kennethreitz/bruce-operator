@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6ce8c782cb25701a9b5c8203f9deee1aeed26ca6cd732df4cda162dd986f149e"
+            "sha256": "f234e7a7715fe7dfaf399ba918c77088dca9ee4df199158a9572fb6f83e64ace"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -46,6 +46,10 @@
             ],
             "markers": "python_version >= '3'",
             "version": "==1.0.2"
+        },
+        "bruce-operator": {
+            "editable": true,
+            "path": "."
         },
         "cachetools": {
             "hashes": [
@@ -144,6 +148,13 @@
             ],
             "index": "pypi",
             "version": "==0.1.1"
+        },
+        "docopt": {
+            "hashes": [
+                "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"
+            ],
+            "index": "pypi",
+            "version": "==0.6.2"
         },
         "futures": {
             "hashes": [
