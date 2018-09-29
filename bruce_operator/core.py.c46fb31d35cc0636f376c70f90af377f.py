@@ -30,6 +30,7 @@ class Operator:
 
         # Ensure resource definitions.
         self.ensure_resource_definitions()
+        self.ensure_volumes()
         # print(self.installed_buildpacks)
         # exit()
 
@@ -83,11 +84,17 @@ class Operator:
     def ensure_resource_definitions(self):
         # Create Buildpacks resource.
         self.logger.info("Ensuring Buildpack resource definitions...")
-        kubectl("apply -f ./deploy/buildpack-resource-definition.yml")
+        kubectl(
+            f"apply -f ./deploy/buildpack-resource-definition.yml -n {WATCH_NAMESPACE}"
+        )
 
         # Create Apps resource.
         self.logger.info("Ensuring App resource definitions...")
-        kubectl("apply -f ./deploy/app-resource-definition.yml")
+        kubectl(f"apply -f ./deploy/app-resource-definition.yml -n {WATCH_NAMESPACE}")
+
+    def ensure_volumes(self):
+        self.logger.info("Ensuring Buildpack volume resource...")
+        kubectl(f"apply -f ./deploy/buildpacks-volume.yml -n {WATCH_NAMESPACE}")
 
     def watch(self):
         self.logger.info("Pretending to watch...")
