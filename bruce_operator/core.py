@@ -6,7 +6,7 @@ from functools import lru_cache
 
 import logme
 import kubernetes
-import background
+import delegator
 from kubeconfig import KubeConfig
 from kubernetes.client.configuration import Configuration
 from kubernetes.client.api_client import ApiClient
@@ -162,6 +162,20 @@ class Operator:
 operator = Operator()
 
 
-def watch():
-    while True:
-        operator.watch()
+@logme.log
+def watch(fork=True, buildpacks=False, apps=False, logger=None):
+
+    if buildpacks and apps:
+        raise RuntimeError("Can only watch one at a time: buildpacks and apps.")
+
+    if fork:
+        subprocesses = []
+        for t in ("apps", "buildpacks"):
+            cmd = "bruce-operator watch --{t}"
+            logger.info(f"Running $ {cmd} in the background.")
+            c = delegator.run(cmd, block=False)
+            subprocesses.append(c)
+
+        logger.info(f"Blocking on subprocesses completion.")
+        for subprocess in subprocesses:
+            subprocess.block()
