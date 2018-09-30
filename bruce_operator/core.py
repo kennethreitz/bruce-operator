@@ -47,7 +47,7 @@ class Operator:
         self.ensure_registry()
 
         # Fetch all the buildpacks.
-        self.spawn_fetch_buildpacks()
+        # self.spawn_fetch_buildpacks()
 
     @property
     def installed_buildpacks(self):
