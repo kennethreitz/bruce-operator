@@ -58,3 +58,20 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\me\OneDrive\system\bin\kompose.exe convert -f .\kubernetes-compose.yml
+    kompose.version: 1.1.0 (36652f6)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: bruce-operator
+  name: bruce-operator
+spec:
+  clusterIP: None
+  selector:
+    io.kompose.service: bruce-operator
+status:
+  loadBalancer: {}
