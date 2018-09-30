@@ -28,7 +28,7 @@ from .kubectl import kubectl
 
 @logme.log
 class Operator:
-    def __init__(self, api_client=None):
+    def __init__(self, api_client=None, fetch_buildpacks=True):
 
         # Ensure that we can load the kubeconfig.
         self.ensure_kubeconfig()
@@ -44,8 +44,7 @@ class Operator:
         self.ensure_registry()
 
         # Fetch all the buildpacks.
-        c = self.spawn_fetch_buildpacks()
-        c.block()
+        c = self.fetch_buildpacks()
 
     @property
     def installed_buildpacks(self):
@@ -153,35 +152,19 @@ class Operator:
         self.logger.info("Ensuring Registry service...")
         kubectl(f"apply -f ./deploy/registry-service.yml -n {WATCH_NAMESPACE}")
 
-    def watch(self):
-        self.logger.info("Pretending to watch...")
-        time.sleep(5)
+    def watch(self, fork=True, buildpacks=False, apps=False):
+        if buildpacks and apps:
+            raise RuntimeError("Can only watch one at a time: buildpacks and apps.")
 
+        if fork:
+            subprocesses = []
 
-operator = Operator()
+            for t in ("apps", "buildpacks"):
+                cmd = f"bruce-operator watch --{t}"
+                self.logger.info(f"Running $ {cmd} in the background.")
+                c = delegator.run(cmd, block=False)
+                subprocesses.append(c)
 
-
-@logme.log
-def watch(fork=True, buildpacks=False, apps=False, logger=None):
-
-    if buildpacks and apps:
-        raise RuntimeError("Can only watch one at a time: buildpacks and apps.")
-
-    if fork:
-        subprocesses = []
-
-        cmd = f"bruce-operator fetch-buildpacks"
-        logger.info(f"Running $ {cmd} in the background.")
-        c = delegator.run(cmd, block=False)
-        subprocesses.append(c)
-
-        for t in ("apps", "buildpacks"):
-            logger.info(f"Fetching buildpacks in the background.")
-            cmd = f"bruce-operator watch --{t}"
-            logger.info(f"Running $ {cmd} in the background.")
-            c = delegator.run(cmd, block=False)
-            subprocesses.append(c)
-
-        logger.info(f"Blocking on subprocesses completion.")
-        for subprocess in subprocesses:
-            subprocess.block()
+            self.logger.info(f"Blocking on subprocesses completion.")
+            for subprocess in subprocesses:
+                subprocess.block()

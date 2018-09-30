@@ -10,4 +10,3 @@ OPERATOR_IMAGE = "kennethreitz/bruce-operator:latest"
 TOKEN_LOCATION = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 CERT_LOCATION = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 IN_KUBERNETES = os.path.isfile(TOKEN_LOCATION)
-KUBECONFIG_PATH = os.path.expanduser("~/.kube/config")
