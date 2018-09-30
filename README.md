@@ -27,8 +27,19 @@
 ✨🍰✨
 
 
-## This Repo
+## Deploying This Repo
+
+This is an active development project, so I don't recommend this, yet.
+
+    $ git clone https://github.com/kennethreitz/bruce-operator.git && cd bruce-operator
+    $ kubectl create -f deploy/_bruce-namespace.yml
+    $ kubectl create -f deploy/operator.yml
+
+The operator will take care of installing Custom Resource Definitions, Perstient Volume Claims, etc.
+
+## Developing This Repo
 
 The BRUCE operator, written in Python (will be attempted, at least).
 
+    # ./build.bat
     $ docker build --tag kennethreitz/bruce-operator .
