@@ -1,4 +1,4 @@
-# bruce-operator
+# BRUCE Kubernetes Operator
 
 **B**uildpack **RU**ntime **C**ontainer **E**nvironment.
 
@@ -31,4 +31,4 @@
 
 The BRUCE operator, written in Python (will be attempted, at least).
 
-    $ docker build --tag bruceproject/operator .
+    $ docker build --tag kennethreitz/bruce-operator .
