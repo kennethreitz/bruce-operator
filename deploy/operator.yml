@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: bruce-operator
-          image: bruceproject/operator:latest
+          image: kennethreitz/bruce-operator:latest
           imagePullPolicy: Always
           env:
             - name: WATCH_NAMESPACE
