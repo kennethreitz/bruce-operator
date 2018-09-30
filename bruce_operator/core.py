@@ -40,12 +40,14 @@ class Operator:
         self.client = kubernetes.client.CoreV1Api()
         self.custom_client = kubernetes.client.CustomObjectsApi(self.client.api_client)
 
-        # Ensure Registry.
+        # Ensure resource definitions.
+        self.ensure_namespace()
+        self.ensure_resource_definitions()
+        self.ensure_volumes()
         self.ensure_registry()
 
         # Fetch all the buildpacks.
-        c = self.spawn_fetch_buildpacks()
-        c.block()
+        # self.spawn_fetch_buildpacks()
 
     @property
     def installed_buildpacks(self):
@@ -94,7 +96,7 @@ class Operator:
         except kubernetes.client.rest.ApiException:
             return None
 
-    def kube_spawn_self(self, cmd, label, env=None):
+    def spawn_self(self, cmd, label, env=None):
         if env is None:
             env = {}
 
@@ -104,12 +106,9 @@ class Operator:
             f"run bruce-operator-{label}-{_hash} --image={OPERATOR_IMAGE} -n {WATCH_NAMESPACE} --restart=Never --quiet=True --record=True --image-pull-policy=Always -- bruce-operator {cmd}"
         )
 
-    def spawn_self(self, cmd, label, env=None):
-        if env is None:
-            env = {}
-
-        # TODO: ENV
-        return delegator.run(f"bruce-operator {cmd}", block=False)
+    def ensure_namespace(self):
+        self.logger.info("Ensuring bruce namespace...")
+        kubectl(f"apply -f ./deploy/_bruce-namespace.yml", raise_on_error=False)
 
     def ensure_kubeconfig(self):
         """Ensures that ~/.kube/config exists, when running in Kubernetes."""
@@ -137,11 +136,25 @@ class Operator:
             # Use the context.
             kc.use_context("context")
 
+    def ensure_resource_definitions(self):
+        # Create Buildpacks resource.
+        self.logger.info("Ensuring Buildpack resource definitions...")
+        kubectl(
+            f"apply -f ./deploy/buildpack-resource-definition.yml -n {WATCH_NAMESPACE}"
+        )
+
+        # Create Apps resource.
+        self.logger.info("Ensuring App resource definitions...")
+        kubectl(f"apply -f ./deploy/app-resource-definition.yml -n {WATCH_NAMESPACE}")
+
+    def ensure_volumes(self):
+        self.logger.info("Ensuring Buildpack volume resource...")
+        kubectl(f"apply -f ./deploy/buildpacks-volume.yml -n {WATCH_NAMESPACE}")
+
     def spawn_fetch_buildpacks(self):
-        c = self.spawn_self(f"fetch-buildpacks", label="fetch")
+        self.spawn_self(f"fetch-buildpacks", label="fetch")
         for buildpack in self.installed_buildpacks:
             self.logger.info(f"Pretending to fetch {buildpack_name!r} buildpack!")
-        return c
 
     def ensure_registry(self):
         self.logger.info("Ensuring Registry volume...")
