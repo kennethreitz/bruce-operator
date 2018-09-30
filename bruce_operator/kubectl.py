@@ -3,8 +3,6 @@ import json
 import logme
 import delegator
 
-from .env import TOKEN_LOCATION, IN_KUBERNETES, CERT_LOCATION
-
 
 @logme.log
 def kubectl(cmd, as_json=True, raise_on_error=True, logger=None):
