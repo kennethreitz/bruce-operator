@@ -171,7 +171,7 @@ def watch(fork=True, buildpacks=False, apps=False, logger=None):
     if fork:
         subprocesses = []
         for t in ("apps", "buildpacks"):
-            cmd = "bruce-operator watch --{t}"
+            cmd = f"bruce-operator watch --{t}"
             logger.info(f"Running $ {cmd} in the background.")
             c = delegator.run(cmd, block=False)
             subprocesses.append(c)
