@@ -182,7 +182,14 @@ def watch(fork=True, buildpacks=False, apps=False, logger=None):
 
     if fork:
         subprocesses = []
+
+        cmd = f"bruce-operator fetch-buildpacks"
+        logger.info(f"Running $ {cmd} in the background.")
+        c = delegator.run(cmd, block=False)
+        subprocesses.append(c)
+
         for t in ("apps", "buildpacks"):
+            logger.info(f"Fetching buildpacks in the background.")
             cmd = f"bruce-operator watch --{t}"
             logger.info(f"Running $ {cmd} in the background.")
             c = delegator.run(cmd, block=False)
