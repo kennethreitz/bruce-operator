@@ -57,4 +57,5 @@ class Buildpack:
 
 def fetch_buildpack(buildpack_info):
     bp = Buildpack.from_info(buildpack_info)
-    bp.fetch()
+    bp_path = bp.fetch()
+    print(bp_path)

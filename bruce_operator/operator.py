@@ -111,7 +111,9 @@ class Operator:
     def ensure_kubeconfig(self):
         """Ensures that ~/.kube/config exists, when running in Kubernetes."""
         # If we're running in a kubernets cluster...
-        if IN_KUBERNETES:
+        if IN_KUBERNETES and not os.path.isfile(
+            os.path.expanduser("~/.kube/config.lock")
+        ):
             host = os.environ["KUBERNETES_SERVICE_HOST"]
             port = os.environ["KUBERNETES_SERVICE_PORT"]
             # Create a KubeConfig file.
