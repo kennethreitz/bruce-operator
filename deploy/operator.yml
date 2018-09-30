@@ -75,3 +75,112 @@ spec:
     io.kompose.service: bruce-operator
 status:
   loadBalancer: {}
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: buildpacks.bruce.kennethreitz.org
+spec:
+  group: bruce.kennethreitz.org
+  names:
+    kind: Buildpack
+    listKind: buildpackList
+    plural: buildpacks
+    singular: buildpack
+    shortNames: [bp,]
+  scope: Namespaced
+  version: v1alpha1
+---
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: buildpacks-volume
+  name: buildpacks-volume
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+status: {}
+---
+apiVersion: v1
+items:
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "ruby"
+    buildkit: "heroku/ruby"
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "nodejs"
+    buildkit: "heroku/nodejs"
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "clojure"
+    buildkit: "heroku/clojure"
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "python"
+    buildkit: "heroku/python"
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "java"
+    buildkit: "heroku/java"
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "gradle"
+    buildkit: "heroku/gradle"
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "scala"
+    buildkit: "heroku/scala"
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "php"
+    buildkit: "heroku/php"
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "go"
+    buildkit: "heroku/go"
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "elixir"
+    buildkit: "hashnuke/elixir"
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "static"
+    repo: "https://github.com/dokku/buildpack-nginx"
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
+    name: "multi"
+    repo: "https://github.com/heroku/heroku-buildpack-multi"
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: apps.bruce.kennethreitz.org
+spec:
+  group: bruce.kennethreitz.org
+  names:
+    kind: App
+    listKind: appList
+    plural: apps
+    singular: app
+  scope: Namespaced
+  version: v1alpha1
