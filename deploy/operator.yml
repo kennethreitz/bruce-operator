@@ -1,3 +1,57 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: bruce-operator
+rules:
+- apiGroups:
+  - extensions
+  resources:
+  - thirdpartyresources
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - update
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  - persistientvolumeclaims
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - bruce.kennethreitz.org
+  resources:
+  - "*"
+  verbs:
+  - "*"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bruce-operator
+  namespace: bruce
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: bruce-operator
+  namespace: bruce
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: bruce-operator
+subjects:
+- kind: ServiceAccount
+  name: bruce-operator
+  namespace: bruce
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -11,7 +65,9 @@ spec:
     metadata:
       labels:
         name: bruce-operator
+      namespace: bruce
     spec:
+      serviceAccountName: bruce-operator
       containers:
         - name: bruce-operator
           image: kennethreitz/bruce-operator:latest

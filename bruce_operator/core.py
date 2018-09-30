@@ -108,7 +108,7 @@ class Operator:
 
     def ensure_namespace(self):
         self.logger.info("Ensuring bruce namespace...")
-        kubectl(f"apply -f ./deploy/_bruce-namespace.yml")
+        kubectl(f"apply -f ./deploy/_bruce-namespace.yml", raise_on_error=False)
 
     def ensure_kubeconfig(self):
         """Ensures that ~/.kube/config exists, when running in Kubernetes."""
