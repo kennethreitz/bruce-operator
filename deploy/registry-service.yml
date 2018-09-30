@@ -13,7 +13,7 @@ spec:
   ports:
   - name: registry-http
     port: 80
-    nodePort: 80
+    # nodePort: 80
     targetPort: 0
   selector:
     io.kompose.service: registry

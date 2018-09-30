@@ -41,12 +41,13 @@ class Operator:
         self.custom_client = kubernetes.client.CustomObjectsApi(self.client.api_client)
 
         # Ensure resource definitions.
+        self.ensure_namespace()
         self.ensure_resource_definitions()
         self.ensure_volumes()
-        # TODO: Ensure registry.
+        self.ensure_registry()
 
         # Fetch all the buildpacks.
-        self.fetch_buildpacks()
+        self.spawn_fetch_buildpacks()
 
     @property
     def installed_buildpacks(self):
@@ -105,6 +106,10 @@ class Operator:
             f"run bruce-operator-{label}-{_hash} --image={OPERATOR_IMAGE} -n {WATCH_NAMESPACE} --restart=Never --quiet=True --record=True --image-pull-policy=Always -- bruce-operator {cmd}"
         )
 
+    def ensure_namespace(self):
+        self.logger.info("Ensuring bruce namespace...")
+        kubectl(f"apply -f ./deploy/_bruce-namespace.yml")
+
     def ensure_kubeconfig(self):
         """Ensures that ~/.kube/config exists, when running in Kubernetes."""
         # If we're running in a kubernets cluster...
@@ -147,12 +152,19 @@ class Operator:
         kubectl(f"apply -f ./deploy/buildpacks-volume.yml -n {WATCH_NAMESPACE}")
 
     def spawn_fetch_buildpacks(self):
+        self.spawn_self(f"fetch-buildpacks", label="fetch")
         for buildpack in self.installed_buildpacks:
             self.logger.info(f"Pretending to fetch {buildpack_name!r} buildpack!")
-            self.spawn_self(f"fetch-buildpacks", label="fetch")
 
-    def fetch_buildpacks(self):
+    def ensure_registry(self):
+        self.logger.info("Ensuring Registry volume...")
+        kubectl(f"apply -f ./deploy/registry-data.yml -n {WATCH_NAMESPACE}")
 
+        self.logger.info("Ensuring Registry deployment...")
+        kubectl(f"apply -f ./deploy/registry-deployment.yml -n {WATCH_NAMESPACE}")
+
+        self.logger.info("Ensuring Registry service...")
+        kubectl(f"apply -f ./deploy/registry-service.yml -n {WATCH_NAMESPACE}")
 
     def watch(self):
         self.logger.info("Pretending to watch...")
