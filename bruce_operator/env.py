@@ -6,7 +6,7 @@ API_GROUP = "bruce.kennethreitz.org"
 
 BUILDPACKS_DIR = "/opt/buildpacks"
 APPCACHE_DIR = "/opt/caches"
-OPERATOR_IMAGE = "bruceproject/operator:latest"
+OPERATOR_IMAGE = "kennethreitz/bruce-operator:latest"
 TOKEN_LOCATION = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 CERT_LOCATION = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 IN_KUBERNETES = os.path.isfile(TOKEN_LOCATION)
