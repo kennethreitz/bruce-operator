@@ -2,7 +2,7 @@
 
 Usage:
   bruce-operator watch [--buildpacks|--apps]
-  bruce-operator fetch [--buildpack=<buildpack>]
+  bruce-operator fetch-buildpacks
   bruce-operator (-h | --help)
 
 Options:
@@ -26,7 +26,7 @@ def main():
 
         watch(fork=True)
 
-    if args["fetch"]:
+    if args["fetch-buildpacks"]:
         print("fetching")
         exit()
 

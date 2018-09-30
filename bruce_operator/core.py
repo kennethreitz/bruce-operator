@@ -146,13 +146,13 @@ class Operator:
         self.logger.info("Ensuring Buildpack volume resource...")
         kubectl(f"apply -f ./deploy/buildpacks-volume.yml -n {WATCH_NAMESPACE}")
 
-    def spawn_fetch_buildpack(self, buildpack_name):
-        self.logger.info(f"Pretending to fetch {buildpack_name!r} buildpack!")
-        self.spawn_self(f"fetch --buildpack={buildpack_name}", label="fetch")
+    def spawn_fetch_buildpacks(self):
+        for buildpack in self.installed_buildpacks:
+            self.logger.info(f"Pretending to fetch {buildpack_name!r} buildpack!")
+            self.spawn_self(f"fetch-buildpacks", label="fetch")
 
     def fetch_buildpacks(self):
-        for buildpack in self.installed_buildpacks:
-            self.spawn_fetch_buildpack(buildpack["metadata"]["name"])
+
 
     def watch(self):
         self.logger.info("Pretending to watch...")
