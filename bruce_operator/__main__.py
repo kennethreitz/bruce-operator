@@ -12,23 +12,24 @@ Options:
 import sys
 from docopt import docopt
 
-from .core import watch
+from .operator import Operator
 
 
 def main():
     args = docopt(__doc__)
+    operator = Operator()
 
     if args["watch"]:
         if args["--buildpacks"]:
-            watch(buildpacks=True)
+            operator.watch(buildpacks=True)
         if args["--apps"]:
-            watch(apps=True)
+            operator.watch(apps=True)
 
-        watch(fork=True)
+        operator.watch(fork=True)
 
     if args["fetch-buildpacks"]:
-        print("fetching")
-        exit()
+        print("Fetching buildpacks...")
+        operator.fetch_buildpacks()
 
 
 if __name__ == "__main__":

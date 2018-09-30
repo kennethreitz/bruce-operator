@@ -62,61 +62,73 @@ items:
   kind: Buildpack
   metadata:
     name: "ruby"
+  spec:
     buildkit: "heroku/ruby"
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "nodejs"
+  spec:
     buildkit: "heroku/nodejs"
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "clojure"
+  spec:
     buildkit: "heroku/clojure"
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "python"
+  spec:
     buildkit: "heroku/python"
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "java"
+  spec:
     buildkit: "heroku/java"
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "gradle"
+  spec:
     buildkit: "heroku/gradle"
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "scala"
+  spec:
     buildkit: "heroku/scala"
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "php"
+  spec:
     buildkit: "heroku/php"
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "go"
+  spec:
     buildkit: "heroku/go"
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "elixir"
+  spec:
     buildkit: "hashnuke/elixir"
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "static"
+  spec:
     repo: "https://github.com/dokku/buildpack-nginx"
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "multi"
+  spec:
     repo: "https://github.com/heroku/heroku-buildpack-multi"
 kind: List
 metadata:

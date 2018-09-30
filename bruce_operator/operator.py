@@ -22,13 +22,14 @@ from .env import (
     TOKEN_LOCATION,
 )
 from .kubectl import kubectl
+from .buildpacks import fetch_buildpack
 
 # https://github.com/kubernetes-client/python/blob/master/examples/create_thirdparty_resource.md
 
 
 @logme.log
 class Operator:
-    def __init__(self, api_client=None):
+    def __init__(self, api_client=None, fetch_buildpacks=True):
 
         # Ensure that we can load the kubeconfig.
         self.ensure_kubeconfig()
@@ -40,17 +41,11 @@ class Operator:
         self.client = kubernetes.client.CoreV1Api()
         self.custom_client = kubernetes.client.CustomObjectsApi(self.client.api_client)
 
-        # Ensure resource definitions.
-        self.ensure_namespace()
-        self.ensure_resource_definitions()
-        self.ensure_volumes()
-        self.ensure_registry()
-
         # Fetch all the buildpacks.
-        # self.spawn_fetch_buildpacks()
+        if fetch_buildpacks:
+            self.fetch_buildpacks()
 
-    @property
-    def installed_buildpacks(self):
+    def installed_buildpacks(self, watch=False):
 
         group = API_GROUP  # str | The custom resource's group name
         version = API_VERSION  # str | The custom resource's version
@@ -62,18 +57,18 @@ class Operator:
             "true"
         )  # str | If 'true', then the output is pretty printed. (optional)
         watch = (
-            False
+            watch
         )  # bool | Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. (optional)
 
         try:
             api_response = self.custom_client.list_namespaced_custom_object(
                 group, version, namespace, plural, pretty=pretty, watch=watch
             )
-            return api_response["items"]
+            for item in api_response["items"]:
+                yield item
         except kubernetes.client.rest.ApiException:
             return None
 
-    @property
     def installed_apps(self):
         group = "bruce.kennethreitz.org"  # str | The custom resource's group name
         version = "v1alpha1"  # str | The custom resource's version
@@ -96,7 +91,7 @@ class Operator:
         except kubernetes.client.rest.ApiException:
             return None
 
-    def spawn_self(self, cmd, label, env=None):
+    def kube_spawn_self(self, cmd, label, env=None):
         if env is None:
             env = {}
 
@@ -106,9 +101,12 @@ class Operator:
             f"run bruce-operator-{label}-{_hash} --image={OPERATOR_IMAGE} -n {WATCH_NAMESPACE} --restart=Never --quiet=True --record=True --image-pull-policy=Always -- bruce-operator {cmd}"
         )
 
-    def ensure_namespace(self):
-        self.logger.info("Ensuring bruce namespace...")
-        kubectl(f"apply -f ./deploy/_bruce-namespace.yml", raise_on_error=False)
+    def spawn_self(self, cmd, label, env=None):
+        if env is None:
+            env = {}
+
+        # TODO: ENV
+        return delegator.run(f"bruce-operator {cmd}", block=False)
 
     def ensure_kubeconfig(self):
         """Ensures that ~/.kube/config exists, when running in Kubernetes."""
@@ -136,65 +134,23 @@ class Operator:
             # Use the context.
             kc.use_context("context")
 
-    def ensure_resource_definitions(self):
-        # Create Buildpacks resource.
-        self.logger.info("Ensuring Buildpack resource definitions...")
-        kubectl(
-            f"apply -f ./deploy/buildpack-resource-definition.yml -n {WATCH_NAMESPACE}"
-        )
+    def fetch_buildpacks(self):
+        for buildpack_info in self.installed_buildpacks():
+            fetch_buildpack(buildpack_info)
 
-        # Create Apps resource.
-        self.logger.info("Ensuring App resource definitions...")
-        kubectl(f"apply -f ./deploy/app-resource-definition.yml -n {WATCH_NAMESPACE}")
+    def watch(self, fork=True, buildpacks=False, apps=False):
+        if buildpacks and apps:
+            raise RuntimeError("Can only watch one at a time: buildpacks and apps.")
 
-    def ensure_volumes(self):
-        self.logger.info("Ensuring Buildpack volume resource...")
-        kubectl(f"apply -f ./deploy/buildpacks-volume.yml -n {WATCH_NAMESPACE}")
+        if fork:
+            subprocesses = []
 
-    def spawn_fetch_buildpacks(self):
-        self.spawn_self(f"fetch-buildpacks", label="fetch")
-        for buildpack in self.installed_buildpacks:
-            self.logger.info(f"Pretending to fetch {buildpack_name!r} buildpack!")
+            for t in ("apps", "buildpacks"):
+                cmd = f"bruce-operator watch --{t}"
+                self.logger.info(f"Running $ {cmd} in the background.")
+                c = delegator.run(cmd, block=False)
+                subprocesses.append(c)
 
-    def ensure_registry(self):
-        self.logger.info("Ensuring Registry volume...")
-        kubectl(f"apply -f ./deploy/registry-data.yml -n {WATCH_NAMESPACE}")
-
-        self.logger.info("Ensuring Registry deployment...")
-        kubectl(f"apply -f ./deploy/registry-deployment.yml -n {WATCH_NAMESPACE}")
-
-        self.logger.info("Ensuring Registry service...")
-        kubectl(f"apply -f ./deploy/registry-service.yml -n {WATCH_NAMESPACE}")
-
-    def watch(self):
-        self.logger.info("Pretending to watch...")
-        time.sleep(5)
-
-
-operator = Operator()
-
-
-@logme.log
-def watch(fork=True, buildpacks=False, apps=False, logger=None):
-
-    if buildpacks and apps:
-        raise RuntimeError("Can only watch one at a time: buildpacks and apps.")
-
-    if fork:
-        subprocesses = []
-
-        cmd = f"bruce-operator fetch-buildpacks"
-        logger.info(f"Running $ {cmd} in the background.")
-        c = delegator.run(cmd, block=False)
-        subprocesses.append(c)
-
-        for t in ("apps", "buildpacks"):
-            logger.info(f"Fetching buildpacks in the background.")
-            cmd = f"bruce-operator watch --{t}"
-            logger.info(f"Running $ {cmd} in the background.")
-            c = delegator.run(cmd, block=False)
-            subprocesses.append(c)
-
-        logger.info(f"Blocking on subprocesses completion.")
-        for subprocess in subprocesses:
-            subprocess.block()
+            self.logger.info(f"Blocking on subprocesses completion.")
+            for subprocess in subprocesses:
+                subprocess.block()
