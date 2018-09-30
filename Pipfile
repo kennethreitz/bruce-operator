@@ -6,11 +6,8 @@ name = "pypi"
 [packages]
 kubernetes = "*"
 "delegator.py" = "*"
-pyyaml = "*"
-"jinja2" = "*"
 click = "*"
 logme = "*"
-background = "*"
 docopt = "*"
 kubeconfig = "*"
 
