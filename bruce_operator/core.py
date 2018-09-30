@@ -1,3 +1,4 @@
+import os
 import time
 import json
 from uuid import uuid4
@@ -16,6 +17,9 @@ from .env import (
     API_VERSION,
     OPERATOR_IMAGE,
     KUBECONFIG_PATH,
+    IN_KUBERNETES,
+    CERT_LOCATION,
+    TOKEN_LOCATION,
 )
 from .kubectl import kubectl
 
@@ -26,11 +30,11 @@ from .kubectl import kubectl
 class Operator:
     def __init__(self, api_client=None):
 
+        # Ensure that we can load the kubeconfig.
+        self.ensure_kubeconfig()
+
         # Load Kube configuration into module (ugh).
-        try:
-            kubernetes.config.load_kube_config()
-        except FileNotFoundError:
-            pass
+        kubernetes.config.load_kube_config()
 
         # Setup clients.
         self.client = kubernetes.client.CoreV1Api()
@@ -39,9 +43,10 @@ class Operator:
         # Ensure resource definitions.
         self.ensure_resource_definitions()
         self.ensure_volumes()
+        # TODO: Ensure registry.
+
+        # Fetch all the buildpacks.
         self.fetch_buildpacks()
-        # print(self.installed_buildpacks)
-        # exit()
 
     @property
     def installed_buildpacks(self):
@@ -100,16 +105,31 @@ class Operator:
             f"run bruce-operator-{label}-{_hash} --image={OPERATOR_IMAGE} -n {WATCH_NAMESPACE} --restart=Never --quiet=True --record=True --image-pull-policy=Always -- bruce-operator {cmd}"
         )
 
-    def ensure_kube_config(self):
+    def ensure_kubeconfig(self):
+        """Ensures that ~/.kube/config exists, when running in Kubernetes."""
+        # If we're running in a kubernets cluster...
         if IN_KUBERNETES:
             host = os.environ["KUBERNETES_SERVICE_HOST"]
             port = os.environ["KUBERNETES_SERVICE_PORT"]
-            conf = KubeConfig()
+            # Create a KubeConfig file.
+            kc = KubeConfig()
+
+            # Read in the secret token.
+            with open(TOKEN_LOCATION, "r") as f:
+                token = f.read()
+
+            # Set the credentials.
+            kc.set_credentials(name="child", token=token)
+            # Set the cluster information.
             kc.set_cluster(
-                name='the-cluster',
-                server='https://{host}:{port}'
+                name="parent",
+                server=f"https://{host}:{port}",
                 certificate_authority=CERT_LOCATION,
             )
+            # Set the context.
+            kc.set_context(name="context", cluster="parent", user="child")
+            # Use the context.
+            kc.use_context("context")
 
     def ensure_resource_definitions(self):
         # Create Buildpacks resource.
