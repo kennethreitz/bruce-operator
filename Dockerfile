@@ -9,4 +9,5 @@ RUN apt-get update
 RUN apt-get install -y kubectl
 
 COPY . /app
+RUN pip3 install -e .
 CMD bruce-operator watch

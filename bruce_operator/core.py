@@ -1,14 +1,22 @@
 import time
 import json
+from uuid import uuid4
 from functools import lru_cache
 
 import logme
 import kubernetes
 import background
+from kubeconfig import KubeConfig
 from kubernetes.client.configuration import Configuration
 from kubernetes.client.api_client import ApiClient
 
-from .env import WATCH_NAMESPACE, API_GROUP, API_VERSION
+from .env import (
+    WATCH_NAMESPACE,
+    API_GROUP,
+    API_VERSION,
+    OPERATOR_IMAGE,
+    KUBECONFIG_PATH,
+)
 from .kubectl import kubectl
 
 # https://github.com/kubernetes-client/python/blob/master/examples/create_thirdparty_resource.md
@@ -82,6 +90,27 @@ class Operator:
         except kubernetes.client.rest.ApiException:
             return None
 
+    def spawn_self(self, cmd, label, env=None):
+        if env is None:
+            env = {}
+
+        # TODO: ENV
+        _hash = uuid4().hex
+        return kubectl(
+            f"run bruce-operator-{label}-{_hash} --image={OPERATOR_IMAGE} -n {WATCH_NAMESPACE} --restart=Never --quiet=True --record=True --image-pull-policy=Always -- bruce-operator {cmd}"
+        )
+
+    def ensure_kube_config(self):
+        if IN_KUBERNETES:
+            host = os.environ["KUBERNETES_SERVICE_HOST"]
+            port = os.environ["KUBERNETES_SERVICE_PORT"]
+            conf = KubeConfig()
+            kc.set_cluster(
+                name='the-cluster',
+                server='https://{host}:{port}'
+                certificate_authority=CERT_LOCATION,
+            )
+
     def ensure_resource_definitions(self):
         # Create Buildpacks resource.
         self.logger.info("Ensuring Buildpack resource definitions...")
@@ -97,12 +126,13 @@ class Operator:
         self.logger.info("Ensuring Buildpack volume resource...")
         kubectl(f"apply -f ./deploy/buildpacks-volume.yml -n {WATCH_NAMESPACE}")
 
-    def fetch_buildpack(self, buildpack_name):
+    def spawn_fetch_buildpack(self, buildpack_name):
         self.logger.info(f"Pretending to fetch {buildpack_name!r} buildpack!")
+        self.spawn_self(f"fetch --buildpack={buildpack_name}", label="fetch")
 
     def fetch_buildpacks(self):
         for buildpack in self.installed_buildpacks:
-            self.fetch_buildpack(buildpack["metadata"]["name"])
+            self.spawn_fetch_buildpack(buildpack["metadata"]["name"])
 
     def watch(self):
         self.logger.info("Pretending to watch...")

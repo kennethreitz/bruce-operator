@@ -2,6 +2,7 @@
 
 Usage:
   bruce-operator watch
+  bruce-operator fetch [--buildpack=<buildpack>]
   bruce-operator (-h | --help)
 
 Options:
@@ -19,6 +20,10 @@ def main():
 
     if args["watch"]:
         watch()
+
+    if args["fetch"]:
+        print("fetching")
+        exit()
 
 
 if __name__ == "__main__":

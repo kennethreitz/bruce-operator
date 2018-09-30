@@ -12,9 +12,10 @@ click = "*"
 logme = "*"
 background = "*"
 docopt = "*"
-bruce-operator = {editable = true, path = "."}
+kubeconfig = "*"
 
 [dev-packages]
+bruce-operator = {editable = true, path = "."}
 "flake8" = "*"
 black = "*"
 

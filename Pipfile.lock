@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f234e7a7715fe7dfaf399ba918c77088dca9ee4df199158a9572fb6f83e64ace"
+            "sha256": "de5a76d65e30ec8c0b2bc15d1392f2bbd7b39e77f986268ff6d605b6fd5c6824"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -46,10 +46,6 @@
             ],
             "markers": "python_version >= '3'",
             "version": "==1.0.2"
-        },
-        "bruce-operator": {
-            "editable": true,
-            "path": "."
         },
         "cachetools": {
             "hashes": [
@@ -184,6 +180,13 @@
             ],
             "index": "pypi",
             "version": "==2.10"
+        },
+        "kubeconfig": {
+            "hashes": [
+                "sha256:393bdf6b03d4830c11c8d47e267fd65a3bed82518492b20b9fe554c7cd6c8111"
+            ],
+            "index": "pypi",
+            "version": "==1.0.1"
         },
         "kubernetes": {
             "hashes": [
@@ -340,6 +343,10 @@
             ],
             "index": "pypi",
             "version": "==18.9b0"
+        },
+        "bruce-operator": {
+            "editable": true,
+            "path": "."
         },
         "click": {
             "hashes": [
