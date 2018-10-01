@@ -181,12 +181,22 @@ spec:
       labels:
         io.kompose.service: bruce-operator
     spec:
+      initContainers:
+      - name: init-wait
+        image: alpine
+        command: ["sh", "-c", "for i in $(seq 1 300); do nc -zvw1 minio.bruce 9000 && exit 0 || sleep 3; done; exit 1"]
       containers:
       - env:
         - name: WATCH_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: MINIO_ACCESS_KEY
+          value: brucebruce
+        - name: MINIO_SECRET_KEY
+          value: brucebruce
+        - name: MINIO_SERVER
+          value: minio.bruce:9000
         image: kennethreitz/bruce-operator:latest
         name: bruce-operator
         resources: {}
@@ -286,5 +296,85 @@ spec:
     targetPort: 0
   selector:
     io.kompose.service: registry
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: bruce-minio-data
+  name: bruce-minio-data
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+status: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\me\OneDrive\system\bin\kompose.exe convert -f .\kubernetes-compose.yml
+    kompose.version: 1.1.0 (36652f6)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: minio
+  name: minio
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: minio
+    spec:
+      containers:
+      - env:
+        - name: MINIO_ACCESS_KEY
+          value: brucebruce
+        - name: MINIO_SECRET_KEY
+          value: brucebruce
+        image: minio/minio:latest
+        ports:
+        - containerPort: 9000
+        args:
+        - server
+        - /storage
+        name: minio
+        resources: {}
+        volumeMounts:
+        - mountPath: /storage
+          name: bruce-minio-data
+      restartPolicy: Always
+      volumes:
+      - name: bruce-minio-data
+        persistentVolumeClaim:
+          claimName: bruce-minio-data
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\me\OneDrive\system\bin\kompose.exe convert -f .\kubernetes-compose.yml
+    kompose.version: 1.1.0 (36652f6)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: minio
+  name: minio
+spec:
+  clusterIP: None
+  ports:
+  - name: minio-http
+    port: 9000
+    targetPort: 0
+  selector:
+    io.kompose.service: minio
 status:
   loadBalancer: {}

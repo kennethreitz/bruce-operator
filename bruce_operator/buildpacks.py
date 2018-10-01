@@ -9,6 +9,8 @@ from .env import (
     OPERATOR_HTTP_SERVICE_ADDRESS,
 )
 
+from . import storage
+
 requests = Session()
 
 # TODO: support builkit versions.
@@ -25,6 +27,7 @@ class Buildpack:
         self.repo = None
         self.index = None
         self.meta = {}
+        self.minio = storage.get_minio()
 
         # Ensure the buildpacks directory exists.
         os.makedirs(BUILDPACKS_DOWNLOAD_DIR, exist_ok=True)
@@ -36,29 +39,31 @@ class Buildpack:
     def is_repo(self):
         return bool(self.repo)
 
-    def _download_url_to_fname(self, url, f_name):
+    def _download_url_to_minio(self, url, f_name):
         self.logger.info(f"Downloading {self.name!r} buildpack...")
         r = requests.get(url)
-        with open(f_name, "wb") as f:
-            f.write(r.content)
+        storage.set_buildpack(minio=self.minio, name=f_name, value=r.content)
 
     def _f_name(self, i):
         i = i = "%03d" % i
-        return f"{BUILDPACKS_DOWNLOAD_DIR}/{i}-{self.name}.tgz"
+        return f"{i}-{self.name}.tgz"
 
     def fetch_repo(self, i=0):
         is_github = "github.com" in self.repo
 
-        if not os.path.isfile(self._f_name(i)):
+        cached_buildppack = storage.get_buildpack(
+            minio=self.minio, name=self._f_name(i)
+        )
+        if not cached_buildpack:
             if is_github:
                 url = f"{self.repo}/archive/master.tar.gz"
-                self._download_url_to_fname(url=url, f_name=self._f_name(i))
+                self._download_url_to_minio(url=url, f_name=self._f_name(i))
 
     def fetch_buildkit(self, i=0):
         url = BUILDKIT_TEMPLATE.format(self.buildkit)
 
         if not os.path.isfile(self._f_name(i)):
-            self._download_url_to_fname(url=url, f_name=self._f_name(i))
+            self._download_url_to_minio(url=url, f_name=self._f_name(i))
         else:
             self.logger.info(f"Using cached {self.name!r} buildpack.")
 

@@ -17,3 +17,8 @@ IN_KUBERNETES = os.path.isfile(TOKEN_LOCATION)
 IN_WINDOWS = os.name == "nt"
 KUBECONFIG_PATH = os.path.expanduser("~/.kube/config")
 BUILDKIT_TEMPLATE = "https://codon-buildpacks.s3.amazonaws.com/buildpacks/{}.tgz"
+
+MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY")
+MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY")
+MINIO_SERVER = os.environ.get("MINIO_SERVER")
+BUILDPACKS_BUCKET = "buildpacks"

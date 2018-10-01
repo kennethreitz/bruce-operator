@@ -25,12 +25,9 @@ COPY Pipfile.lock Pipfile.lock
 RUN apt install -y docker.io
 
 # RUN apt-get update -qq && apt-get install -qq -y daemontools && apt-get -qq -y --allow-downgrades --allow-remove-essential --allow-change-held-packages dist-upgrade && apt-get clean  && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/* /var/tmp/*
-COPY . /bruce
-
 
 # Install Herokuish.
 # RUN curl --location --silent https://github.com/gliderlabs/herokuish/releases/download/v0.4.4/herokuish_0.4.4_linux_x86_64.tgz | tar -xzC /bin
-
 
 # Instlall kube-ctl.
 RUN apt-get update && apt-get install -y apt-transport-https
@@ -40,7 +37,7 @@ RUN echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/ap
 RUN apt-get update
 RUN apt-get install -y kubectl
 
-COPY . /app
+COPY . /bruce
 
 # -- Install dependencies:
 RUN set -ex && pipenv install --deploy --system
