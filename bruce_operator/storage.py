@@ -1,6 +1,12 @@
+import os
+
 import boto3
+import botocore
 
 from .env import MINIO_ACCESS_KEY, MINIO_SECRET_KEY, MINIO_SERVER, BUILDPACKS_BUCKET
+
+os.environ["AWS_ACCESS_KEY_ID"] = MINIO_ACCESS_KEY
+os.environ["AWS_SECRET_ACCESS_KEY"] = MINIO_SECRET_KEY
 
 
 def get_minio():
@@ -16,19 +22,24 @@ def get_minio():
     return minio
 
 
-def ensure_bucket(*minio, buildpacks=True):
+def ensure_buckets(*, minio, buildpacks=True):
     if buildpacks:
         try:
             minio.create_bucket(Bucket=BUILDPACKS_BUCKET)
-        except ValueError:
+        except botocore.errorfactory.ClientError:
             pass
 
 
 def get_buildpack(*, minio, name):
+    ensure_buckets(minio=minio)
     o = minio.Object(BUILDPACKS_BUCKET, name)
-    return o.get()["Body"].read()
+    try:
+        return o.get()["Body"].read()
+    except botocore.errorfactory.ClientError:
+        return None
 
 
 def set_buildpack(*, minio, name, value):
+    ensure_buckets(minio=minio)
     o = minio.Object(BUILDPACKS_BUCKET, name)
     return o.put(Body=value)

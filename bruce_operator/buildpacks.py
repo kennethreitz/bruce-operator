@@ -51,9 +51,7 @@ class Buildpack:
     def fetch_repo(self, i=0):
         is_github = "github.com" in self.repo
 
-        cached_buildppack = storage.get_buildpack(
-            minio=self.minio, name=self._f_name(i)
-        )
+        cached_buildpack = storage.get_buildpack(minio=self.minio, name=self._f_name(i))
         if not cached_buildpack:
             if is_github:
                 url = f"{self.repo}/archive/master.tar.gz"
