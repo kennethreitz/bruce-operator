@@ -64,10 +64,12 @@ class Operator:
             api_response = self.custom_client.list_namespaced_custom_object(
                 group, version, namespace, plural, pretty=pretty, watch=watch
             )
-            for item in api_response["items"]:
-                yield item
+            items = api_response["items"]
         except kubernetes.client.rest.ApiException:
             return None
+
+        # Sort the buildpacks by their specified index.
+        return sorted(items, key=lambda k: k["spec"]["index"])
 
     def installed_apps(self):
         group = "bruce.kennethreitz.org"  # str | The custom resource's group name
@@ -137,8 +139,8 @@ class Operator:
             kc.use_context("context")
 
     def fetch_buildpacks(self):
-        for buildpack_info in self.installed_buildpacks():
-            fetch_buildpack(buildpack_info)
+        for i, buildpack_info in enumerate(self.installed_buildpacks()):
+            fetch_buildpack(i=i, buildpack_info=buildpack_info)
 
     def watch(self, fork=True, buildpacks=False, apps=False):
         if buildpacks and apps:

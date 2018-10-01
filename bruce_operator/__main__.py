@@ -3,6 +3,7 @@
 Usage:
   bruce-operator watch [--buildpacks|--apps]
   bruce-operator fetch-buildpacks
+  bruce-operator http
   bruce-operator (-h | --help)
 
 Options:
@@ -13,6 +14,7 @@ import sys
 from docopt import docopt
 
 from .operator import Operator
+from .http import app
 
 
 def main():
@@ -30,6 +32,10 @@ def main():
     if args["fetch-buildpacks"]:
         print("Fetching buildpacks...")
         operator.fetch_buildpacks()
+
+    if args["http"]:
+        print("Starting webapp...")
+        app.run()
 
 
 if __name__ == "__main__":

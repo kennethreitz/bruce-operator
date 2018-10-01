@@ -61,75 +61,87 @@ items:
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
+    name: "multi"
+  spec:
+    repo: "https://github.com/heroku/heroku-buildpack-multi"
+    index: 0
+- apiVersion: bruce.kennethreitz.org/v1alpha1
+  kind: Buildpack
+  metadata:
     name: "ruby"
   spec:
     buildkit: "heroku/ruby"
+    index: 1
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "nodejs"
   spec:
     buildkit: "heroku/nodejs"
+    index: 2
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "clojure"
   spec:
     buildkit: "heroku/clojure"
+    index: 3
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "python"
   spec:
     buildkit: "heroku/python"
+    index: 4
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "java"
   spec:
     buildkit: "heroku/java"
+    index: 5
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "gradle"
   spec:
     buildkit: "heroku/gradle"
+    index: 6
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "scala"
   spec:
     buildkit: "heroku/scala"
+    index: 7
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "php"
   spec:
     buildkit: "heroku/php"
+    index: 8
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "go"
   spec:
     buildkit: "heroku/go"
+    index: 9
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "elixir"
   spec:
     buildkit: "hashnuke/elixir"
+    index: 10
 - apiVersion: bruce.kennethreitz.org/v1alpha1
   kind: Buildpack
   metadata:
     name: "static"
   spec:
     repo: "https://github.com/dokku/buildpack-nginx"
-- apiVersion: bruce.kennethreitz.org/v1alpha1
-  kind: Buildpack
-  metadata:
-    name: "multi"
-  spec:
-    repo: "https://github.com/heroku/heroku-buildpack-multi"
+    index: 11
 kind: List
 metadata:
   resourceVersion: ""
