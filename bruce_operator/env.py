@@ -14,5 +14,6 @@ OPERATOR_IMAGE = "kennethreitz/bruce-operator:latest"
 TOKEN_LOCATION = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 CERT_LOCATION = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 IN_KUBERNETES = os.path.isfile(TOKEN_LOCATION)
+IN_WINDOWS = os.name == "nt"
 KUBECONFIG_PATH = os.path.expanduser("~/.kube/config")
 BUILDKIT_TEMPLATE = "https://codon-buildpacks.s3.amazonaws.com/buildpacks/{}.tgz"

@@ -148,6 +148,10 @@ class Operator:
 
         if fork:
             subprocesses = []
+            cmd = f"bruce-operator http"
+            self.logger.info(f"Running $ {cmd} in the background.")
+            c = delegator.run(cmd, block=False)
+            subprocesses.append(c)
 
             for t in ("apps", "buildpacks"):
                 cmd = f"bruce-operator watch --{t}"

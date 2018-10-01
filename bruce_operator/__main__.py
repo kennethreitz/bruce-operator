@@ -10,11 +10,15 @@ Options:
   -h --help     Show this screen.
 """
 
+import os
 import sys
+
+import delegator
 from docopt import docopt
 
 from .operator import Operator
 from .http import app
+from .env import IN_WINDOWS
 
 
 def main():
@@ -35,7 +39,11 @@ def main():
 
     if args["http"]:
         print("Starting webapp...")
-        app.run()
+
+        if not IN_WINDOWS:
+            os.system("gunicorn bruce_operator.http:app -b 0.0.0.0:80")
+        else:
+            app.run(port=80)
 
 
 if __name__ == "__main__":
