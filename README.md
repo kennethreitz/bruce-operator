@@ -31,9 +31,7 @@
 
 This is an active development project, so I don't recommend this, yet.
 
-    $ git clone https://github.com/kennethreitz/bruce-operator.git && cd bruce-operator
-    $ kubectl create -f deploy/_bruce-namespace.yml
-    $ kubectl create -f deploy/operator.yml -n bruce
+    $ kubectl create -n bruce -f https://raw.githubusercontent.com/kennethreitz/bruce-operator/master/deploy/operator.yml
 
 The operator will take care of installing Custom Resource Definitions, Perstient Volume Claims, etc.
 
