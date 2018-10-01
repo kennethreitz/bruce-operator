@@ -205,6 +205,11 @@ metadata:
   name: bruce-operator
 spec:
   clusterIP: None
+  ports:
+  - name: operator-http
+    port: 80
+    # nodePort: 80
+    targetPort: 0
   selector:
     io.kompose.service: bruce-operator
 status:
