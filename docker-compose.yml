@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  # bruce-operator:
+  #   build: .
+  #   ports:
+  #     - "8080:80"
+  #   depends_on:  &services
+  #     - minio
+  #     - registry
+  #   environment: &env
+  #     - MINIO_ACCESS_KEY=brucebruce
+  #     - MINIO_SECRET_KEY=brucebruce
+  #     - MINIO_SERVER=mioio:9000
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #     - REGISTRY_URL=registry:80
+  #   volumes: &vol
+  #     - .:/bruce
+  #     - ~/.kube:/root/.kube
+  #     # - ./data/docker:/var/lib/docker/
+  #     # - /var/run/docker.sock:/var/run/docker.sock
+  minio:
+    image: minio/minio:latest
+    volumes:
+      - ./data/minio:/storage
+    command: ["minio", "server", "/storage"]
+    environment:
+      - MINIO_ACCESS_KEY=brucebruce
+      - MINIO_SECRET_KEY=brucebruce
+    ports:
+     - 9000:9000
+  registry:
+    image: registry:2
+    restart: always
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:80
+    volumes:
+      - ./data/registry:/var/lib/registry
+    ports:
+     - 80:80
+
+
+volumes:
+  builds:
