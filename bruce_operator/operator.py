@@ -22,7 +22,9 @@ from .env import (
     TOKEN_LOCATION,
 )
 from .kubectl import kubectl
-from .buildpacks import fetch_buildpack
+from .buildpacks import fetch_buildpack, extract_buildpacks
+from .apps import App
+from .builds import Build
 
 # https://github.com/kubernetes-client/python/blob/master/examples/create_thirdparty_resource.md
 
@@ -71,6 +73,7 @@ class Operator:
         # Sort the buildpacks by their specified index.
         return sorted(items, key=lambda k: k["spec"]["index"])
 
+    @property
     def installed_apps(self):
         group = "bruce.kennethreitz.org"  # str | The custom resource's group name
         version = "v1alpha1"  # str | The custom resource's version
@@ -142,6 +145,23 @@ class Operator:
         for i, buildpack_info in enumerate(self.installed_buildpacks()):
             fetch_buildpack(i=i, buildpack_info=buildpack_info)
 
+    def build_app(self, app_name):
+        apps = [App.from_info(app) for app in self.installed_apps]
+        app = None
+        for _app in apps:
+            if _app.name == app_name:
+                app = _app
+        if not app:
+            self.logger.info(f"App {app_name!r} not found.")
+            return
+
+        self.logger.info(f"Building {app_name}")
+        buildpacks_dir = extract_buildpacks()
+        build = Build(
+            repo_url=app.repo, app_name=app.name, buildpacks_dir=buildpacks_dir
+        )
+        build.build()
+
     def watch(self, fork=True, buildpacks=False, apps=False):
         if buildpacks and apps:
             raise RuntimeError("Can only watch one at a time: buildpacks and apps.")
@@ -162,3 +182,6 @@ class Operator:
             self.logger.info(f"Blocking on subprocesses completion.")
             for subprocess in subprocesses:
                 subprocess.block()
+
+        if buildpacks:
+            pass

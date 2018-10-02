@@ -4,6 +4,7 @@ Usage:
   bruce-operator watch [--buildpacks|--apps]
   bruce-operator fetch-buildpacks
   bruce-operator http
+  bruce-operator build <appname>
   bruce-operator (-h | --help)
 
 Options:
@@ -19,6 +20,7 @@ from docopt import docopt
 from .operator import Operator
 from .http import app
 from .env import IN_WINDOWS
+from .builds import bootstrap_docker
 
 
 def main():
@@ -44,6 +46,12 @@ def main():
             os.system("gunicorn bruce_operator.http:app -b 0.0.0.0:80")
         else:
             app.run(port=80)
+
+    if args["build"]:
+        app_name = args["<appname>"]
+        print(f"Building {app_name}")
+        bootstrap_docker()
+        operator.build_app(app_name=app_name)
 
 
 if __name__ == "__main__":

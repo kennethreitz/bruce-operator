@@ -200,6 +200,8 @@ spec:
         image: kennethreitz/bruce-operator:latest
         name: bruce-operator
         resources: {}
+        securityContext:
+          privileged: true
       restartPolicy: Always
 status: {}
 ---

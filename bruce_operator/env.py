@@ -4,11 +4,8 @@ WATCH_NAMESPACE = os.environ.get("WATCH_NAMESPACE", "bruce")
 API_VERSION = "v1alpha1"
 API_GROUP = "bruce.kennethreitz.org"
 
-# BUILDPACKS_DIR = "/tmp/buildpacks"
-BUILDPACKS_DIR = os.path.expanduser("~/.bruce/buildpacks")
-BUILDPACKS_DOWNLOAD_DIR = os.path.expanduser("~/.bruce/buildpacks/.dl")
 OPERATOR_HTTP_SERVICE_ADDRESS = "http://bruce.bruce-operator:80"
-
+REGISTRY_URL = os.environ.get("REGISTY_URL", "localhost:80")
 # APPCACHE_DIR = "/opt/caches"
 OPERATOR_IMAGE = "kennethreitz/bruce-operator:latest"
 TOKEN_LOCATION = "/var/run/secrets/kubernetes.io/serviceaccount/token"
@@ -22,3 +19,5 @@ MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY")
 MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY")
 MINIO_SERVER = os.environ.get("MINIO_SERVER")
 BUILDPACKS_BUCKET = "buildpacks"
+
+HEROKUISH_IMAGE = "gliderlabs/herokuish"

@@ -2,12 +2,7 @@ import logme
 from requests import Session
 import os
 
-from .env import (
-    BUILDPACKS_DIR,
-    BUILDKIT_TEMPLATE,
-    BUILDPACKS_DOWNLOAD_DIR,
-    OPERATOR_HTTP_SERVICE_ADDRESS,
-)
+from .env import BUILDKIT_TEMPLATE, OPERATOR_HTTP_SERVICE_ADDRESS
 
 from . import storage
 
@@ -27,10 +22,6 @@ class Buildpack:
         self.repo = None
         self.index = None
         self.meta = {}
-        self.minio = storage.get_minio()
-
-        # Ensure the buildpacks directory exists.
-        os.makedirs(BUILDPACKS_DOWNLOAD_DIR, exist_ok=True)
 
         # Install buildpack into global dictionary.
         buildpacks.append(self)
@@ -42,7 +33,7 @@ class Buildpack:
     def _download_url_to_minio(self, url, f_name):
         self.logger.info(f"Downloading {self.name!r} buildpack...")
         r = requests.get(url)
-        storage.set_buildpack(minio=self.minio, name=f_name, value=r.content)
+        storage.buildpacks.set(f_name, r.content)
 
     def _f_name(self, i):
         i = i = "%03d" % i
@@ -51,7 +42,7 @@ class Buildpack:
     def fetch_repo(self, i=0):
         is_github = "github.com" in self.repo
 
-        cached_buildpack = storage.get_buildpack(minio=self.minio, name=self._f_name(i))
+        cached_buildpack = storage.buildpacks.exists(self._f_name(i))
         if not cached_buildpack:
             if is_github:
                 url = f"{self.repo}/archive/master.tar.gz"
@@ -60,7 +51,8 @@ class Buildpack:
     def fetch_buildkit(self, i=0):
         url = BUILDKIT_TEMPLATE.format(self.buildkit)
 
-        if not os.path.isfile(self._f_name(i)):
+        cached_buildpack = storage.buildpacks.exists(self._f_name(i))
+        if not cached_buildpack:
             self._download_url_to_minio(url=url, f_name=self._f_name(i))
         else:
             self.logger.info(f"Using cached {self.name!r} buildpack.")
@@ -92,3 +84,7 @@ def fetch_buildpack(*, i=0, buildpack_info):
     bp = Buildpack.from_info(buildpack_info)
     bp_path = bp.fetch(i)
     # print(bp_path)
+
+
+def extract_buildpacks():
+    pass
